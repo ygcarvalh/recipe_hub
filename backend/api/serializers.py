@@ -24,7 +24,19 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['id', 'name', 'description', 'instructions', 'ingredients', 'restaurants']
+        fields = ['id', 'name', 'description', 'instructions', 'ingredients', 'restaurants', 'created_by']
+
+    def create(self, validated_data):
+        ingredients_data = validated_data.pop("ingredients", [])
+        restaurants = validated_data.pop("restaurants", [])
+        recipe = Recipe.objects.create(**validated_data)
+
+        for ingredient in ingredients_data:
+            Ingredient.objects.create(recipe=recipe, **ingredient)
+
+        recipe.restaurants.set(restaurants)
+
+        return recipe
 
 class ScrapSerializer(serializers.ModelSerializer):
     recipe_id = serializers.PrimaryKeyRelatedField(source='recipe', read_only=True)
