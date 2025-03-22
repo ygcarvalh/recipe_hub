@@ -1,15 +1,17 @@
 from rest_framework import serializers
 from .models import Restaurant, Recipe, Ingredient, Scrap
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 
 class IngredientSerializer(serializers.ModelSerializer):
+    quantity = serializers.CharField(source="unit")  # renomeia para o frontend
     recipe_id = serializers.PrimaryKeyRelatedField(source='recipe', read_only=True)
 
     class Meta:
         model = Ingredient
-        fields = ['id', 'name', 'unit', 'recipe_id']
+        fields = ['id', 'name', 'quantity', 'recipe_id']
 
 class SimpleRestaurantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,3 +54,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token["is_admin"] = user.is_staff
+        token["username"] = user.username
+
+        return token
