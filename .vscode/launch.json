@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "name": "Django: manage.py runserver",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/manage.py",
+      "args": ["runserver"],
+      "django": true,
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "core.settings"
+      },
+      "justMyCode": true
+    }
+  ]
+}

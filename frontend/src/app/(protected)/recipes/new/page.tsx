@@ -94,6 +94,28 @@ const SectionTitle = styled.h3`
   font-size: 1.2rem;
 `;
 
+const CheckboxContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const Label = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: ${({ theme }) => theme.colors.secondary};
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
 export default function NewRecipePage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -107,6 +129,7 @@ export default function NewRecipePage() {
   const [selectedRestaurantIds, setSelectedRestaurantIds] = useState<string[]>(
     []
   );
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState("");
   const [formError, setFormError] = useState("");
 
   useEffect(() => {
@@ -129,9 +152,14 @@ export default function NewRecipePage() {
     setIngredients(newIngredients);
   };
 
-  const handleRestaurantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const options = Array.from(e.target.selectedOptions);
-    setSelectedRestaurantIds(options.map((o) => o.value));
+  const handleRestaurantChange = (id: string) => {
+    setSelectedRestaurantIds((prevSelected) => {
+      if (prevSelected.includes(id)) {
+        return prevSelected.filter((restaurantId) => restaurantId !== id);
+      } else {
+        return [...prevSelected, id];
+      }
+    });
   };
 
   const handleSubmit = async () => {
@@ -212,13 +240,19 @@ export default function NewRecipePage() {
       {loadingRestaurants ? (
         <p>Loading restaurants...</p>
       ) : (
-        <Select multiple onChange={handleRestaurantChange}>
+        <CheckboxContainer>
           {restaurants.map((r) => (
-            <option key={r.id} value={r.id}>
+            <Label key={r.id}>
+              <input
+                type="checkbox"
+                value={r.id}
+                checked={selectedRestaurantIds.includes(r.id)}
+                onChange={() => handleRestaurantChange(r.id)}
+              />
               {r.name}
-            </option>
+            </Label>
           ))}
-        </Select>
+        </CheckboxContainer>
       )}
 
       {(formError || error) && <Error>{formError || error}</Error>}

@@ -14,13 +14,14 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'quantity', 'recipe_id']
 
 class SimpleRestaurantSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
     class Meta:
         model = Restaurant
         fields = ['id', 'name']
 
 class RecipeSerializer(serializers.ModelSerializer):
-    ingredients = IngredientSerializer(many=True, read_only=True)
-    restaurants = SimpleRestaurantSerializer(many=True, read_only=True)
+    ingredients = IngredientSerializer(many=True)
+    restaurants = SimpleRestaurantSerializer(many=True)
 
     class Meta:
         model = Recipe
@@ -28,13 +29,34 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop("ingredients", [])
-        restaurants = validated_data.pop("restaurants", [])
+        restaurants_data = validated_data.pop("restaurants", [])
         recipe = Recipe.objects.create(**validated_data)
 
         for ingredient in ingredients_data:
-            Ingredient.objects.create(recipe=recipe, **ingredient)
+            ingredient_instance = Ingredient.objects.create(recipe=recipe, **ingredient)
 
-        recipe.restaurants.set(restaurants)
+            recipe.ingredients.add(ingredient_instance)
+
+        for restaurant_data in restaurants_data:
+            restaurant_id = restaurant_data.get('id')
+
+            if restaurant_id:
+                try:
+                    restaurant = Restaurant.objects.get(id=restaurant_id)
+                    recipe.restaurants.add(restaurant)
+                except Restaurant.DoesNotExist:
+                    raise serializers.ValidationError(f"Restaurant with id {restaurant_id} does not exist.")
+            else:
+                restaurant_name = restaurant_data.get('name')
+
+                if restaurant_name:
+                    restaurant = Restaurant.objects.create(name=restaurant_name)
+                    recipe.restaurants.add(restaurant)
+                else:
+                    restaurant = Restaurant.objects.filter(name='Default Restaurant').first()
+                    if restaurant is None:
+                        restaurant = Restaurant.objects.create(name='Default Restaurant')
+                    recipe.restaurants.add(restaurant)
 
         return recipe
 

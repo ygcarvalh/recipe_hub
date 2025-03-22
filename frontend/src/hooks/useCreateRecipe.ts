@@ -26,6 +26,37 @@ export function useCreateRecipe() {
         throw new Error("You must be logged in to create a recipe.");
       }
 
+      const restaurantsWithName = await Promise.all(
+        data.restaurantIds.map(async (id) => {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/restaurants/${id}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch restaurant with id ${id}`);
+          }
+
+          const restaurantData = await response.json();
+          return { id, name: restaurantData.name };
+        })
+      );
+
+      const requestBody = {
+        name: data.name,
+        description: data.description,
+        instructions: data.instructions,
+        ingredients: data.ingredients,
+        restaurants: restaurantsWithName,
+        created_by: data.created_by_id,
+      };
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/recipes/`,
         {
@@ -34,14 +65,7 @@ export function useCreateRecipe() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            name: data.name,
-            description: data.description,
-            instructions: data.instructions,
-            ingredients: data.ingredients,
-            restaurantIds: data.restaurantIds,
-            created_by: data.created_by_id,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 
