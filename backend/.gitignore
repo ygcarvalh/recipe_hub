@@ -1,0 +1,64 @@
+# Python environment
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Log and cache files
+*.log
+*.sqlite3
+*.db
+
+# IDE/editor configurations
+.vscode/
+.idea/
+*.swp
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Django
+*.migrations/
+db.sqlite3
+media/
+staticfiles/
+.env
+.env.*
+
+# Tests / coverage
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.cache
+nosetests.xml
+test_*.xml
+
+# Pytest
+.pytest_cache/
+
+# Mypy files
+.mypy_cache/
+
+# Pip files
+pip-log.txt
+
+# Temporary files
+tmp/
+temp/
+*.bak
+
+# Docker (if used)
+*.pid
+*.seed
+*.log
+*.out
+*.pid
+*.tar
+*.gz
+
+# pyproject/poetry
+poetry.lock
