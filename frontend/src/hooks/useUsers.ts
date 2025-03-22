@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 export type User = {
   id: string;
   username: string;
-  isAdmin: boolean;
+  is_staff: boolean;
 };
 
 export function useUsers() {

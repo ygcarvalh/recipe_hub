@@ -99,7 +99,7 @@ export default function NewUserPage() {
       return;
     }
 
-    const success = await createUser({ username, password, isAdmin });
+    const success = await createUser({ username, password, is_staff: isAdmin });
 
     if (success) {
       router.push("/users");

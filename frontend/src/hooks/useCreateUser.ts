@@ -4,7 +4,7 @@ import { useState } from "react";
 type CreateUserInput = {
   username: string;
   password: string;
-  isAdmin: boolean;
+  is_staff: boolean;
 };
 
 export function useCreateUser() {

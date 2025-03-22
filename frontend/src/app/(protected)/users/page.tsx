@@ -88,7 +88,7 @@ export default function UsersPage() {
               </p>
               <p>
                 <strong>Role:</strong>{" "}
-                {u.isAdmin ? "Administrator" : "Standard"}
+                {u.is_staff ? "Administrator" : "Standard"}
               </p>
             </UserCard>
           </Link>
